@@ -1,0 +1,13 @@
+.equis {
+    cursor: pointer;
+    font-size:1.5rem;
+    font-weight: 900;
+
+}
+.equis:hover {
+    color: red;
+}
+
+.form-css {
+    width: 100px;
+}

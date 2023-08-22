@@ -1,0 +1,56 @@
+.precio-lista {
+    color: gray;
+    text-decoration: line-through;
+    margin-left: 15px;
+}
+
+.porcentaje-descuento {
+    background-color: var(--color2);
+    color: var(--color-blanco);
+    position: absolute;
+    right: 0;
+    padding: 5px 10px;
+    border-radius: 0 0 0 10px;
+    top: 0;
+}
+
+.vista-rapida {
+    /* position: absolute;
+    top: calc(50% - 57px);
+    left: calc(50% - 18px); */
+    width: 50%;
+    margin-left: 50px;
+    position: relative;
+    bottom : 97px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(8, 60, 48, 0.802);
+    padding: 13px 17px;
+    cursor: pointer;
+    border-radius: 50%;
+    opacity: 0;
+    transition: all .5s ease-in-out;
+}
+
+.vista-rapida:hover {
+    opacity: 1;
+}
+
+.image-content {
+    position: relative;
+}
+
+
+.btnCarrito {
+    color:#FFF;
+    background-color: var(--color2);
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+
+}
+.btnCarrito:hover {
+    background-color: #FFF;
+    color: var(--color2);
+}

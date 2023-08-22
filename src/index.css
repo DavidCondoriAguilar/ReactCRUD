@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fasthand&display=swap');
+
+:root {
+  --color1: #b83c67;
+  --color2: #175f4e;
+  --color3: #c4b344a2;
+  --color4: #c75f1a;
+  --color5: #c72626;
+  --color-blanco: #FFF;
+  --color-negro: #000;
+  --color-gris-claro: #CCCCCC;
+  --color-gris-oscuro: #333333;
+}
+
+body {
+  font-family: 'Jost', sans-serif;
+}
+
+h1 {
+  font-weight: 700;
+  font-size: 40px;
+  letter-spacing: 5px;
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+h2 {
+  font-weight: 400;
+  font-size: 35px;
+  letter-spacing: -1px;
+  font-family: 'Permanent Marker', cursive;
+}
+
+p {
+  font-size: 1.3rem;
+}
+
+h5 {
+  font-weight: 500;
+  font-size: 30px;
+}
+
+.paddi {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.list-group-item.active {
+  background-color: var(--color2);
+  border-color: var(--color2);
+}
+
+.list-group-item {
+  cursor: pointer;
+}
+
+@media (min-width:1680px) {
+
+  .container,
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container-xl,
+  .container-xxl {
+    max-width: 1600px;
+  }
+}
+
+
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+
+/* PRELOADED */
+
