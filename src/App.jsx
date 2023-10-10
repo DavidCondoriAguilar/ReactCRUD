@@ -20,7 +20,7 @@ function App() {
         <MainHeader />
         <MainNav />
         <Routes>
-          <Route path="/inicio" element={<Inicio />} />
+          <Route index path="/" element={<Inicio />} />
           <Route path="/inversiones" element={<Inversiones />} />
           <Route path="/proveedores" element={<Proveedores />} />
           <Route path="/tienda" element={<Tienda />} />
