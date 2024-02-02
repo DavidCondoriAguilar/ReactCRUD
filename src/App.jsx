@@ -10,6 +10,8 @@ import Tienda from "./pages/Tienda";
 import Empleados from "./pages/Empleados";
 import ProductoDetalles from "./pages/ProductoDetalles";
 import Carrito from "./pages/Carrito";
+import Directores from "./pages/Directores";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
         <Routes>
           <Route index path="/" element={<Inicio />} />
           <Route path="/inversiones" element={<Inversiones />} />
+          <Route path="/directores" element={<Directores />} />
           <Route path="/proveedores" element={<Proveedores />} />
           <Route path="/tienda" element={<Tienda />} />
           <Route path="/empleados" element={<Empleados />} />
@@ -30,6 +33,8 @@ function App() {
             element={<ProductoDetalles />}
           />
           <Route path="/carrito" element={<Carrito />} />
+          <Route path="/login" element={<Login />} />
+
         </Routes>
 
         <MainFooter />

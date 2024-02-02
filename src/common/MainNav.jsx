@@ -34,6 +34,11 @@ function MainNav() {
               </Link>
             </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/directores">
+                Directores
+              </Link>
+            </li>
+            <li className="nav-item">
               <Link className="nav-link" to="/Proveedores">
                 Proveedores
               </Link>
@@ -45,13 +50,21 @@ function MainNav() {
             </li>
           </ul>
           <ul className="navbar-nav mb-2 mb-lg-0">
-            <li className="nav-item mx-3">
+            <li className="nav-item mx-3 d-flex">
               <Link className="nav-link" to="/Carrito">
-              <i className="bi fw-bold fs-3 bi-cart" title="Carrito de compras"></i>
+                <i
+                  className="bi fw-bold fs-3 bi-cart"
+                  title="Carrito de compras"
+                ></i>
+              </Link>
+
+              <Link className="nav-link" to="/Login">
+              <i className="bi bi-person fs-3" title="Inicio Secioón">
+                  Iniciar Sesión
+                </i>
               </Link>
             </li>
           </ul>
-          
         </div>
       </div>
     </nav>

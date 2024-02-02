@@ -23,14 +23,13 @@ export default function Tienda() {
   };
 
   const seleccionarCategoria = (event, item) => {
-
     setCategoriaSeleccionada(item);
 
-    let itemLista = document.querySelectorAll("#lista-categorias li")
-    
-    itemLista.forEach(item => {
-      item.classList  .remove("active");
-    })
+    let itemLista = document.querySelectorAll("#lista-categorias li");
+
+    itemLista.forEach((item) => {
+      item.classList.remove("active");
+    });
 
     event.currentTarget.classList.add("active");
 
@@ -63,7 +62,7 @@ export default function Tienda() {
           <div className="col-md-9 col-xl-10 col-sm-12">
             <h3>{categoriaSeleccionada.nombre}</h3>
             <small>{categoriaSeleccionada.descripcion}</small>
-            <Productos categoriaProductos ={categoriaSeleccionada.idcategoria} />
+            <Productos categoriaProductos={categoriaSeleccionada.idcategoria} />
           </div>
         </div>
       </div>

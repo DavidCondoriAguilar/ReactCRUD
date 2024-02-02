@@ -85,6 +85,25 @@ h6 {
   margin-bottom: 0;
 }
 
+.bi-pencil-fill {
+  cursor: pointer;
+  color: #1e6e42;
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+
+
+}
+.bi-x-lg {
+  cursor: pointer;
+  color: #c72626;
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
 
 /* PRELOADED */
 
