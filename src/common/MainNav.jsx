@@ -34,7 +34,7 @@ function MainNav() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/directores">
+              <Link className="nav-link" to="/Directores">
                 Directores
               </Link>
             </li>
