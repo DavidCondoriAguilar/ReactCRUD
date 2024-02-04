@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../style/Login.css";
 import { ApiWebURL } from "../utils";
 
@@ -26,17 +28,21 @@ export default function Login() {
 
     switch (result) {
       case -1:
-        alert("El usuario no está registrado");
+        mostrarNotificacion("El usuario no está registrado", "error");
         break;
       case -2:
-        alert("La contraseña es incorrecta");
+        mostrarNotificacion("La contraseña es incorrecta", "error");
         break;
       default:
-        alert("¡Bienvenido!");
+        mostrarNotificacion("¡Bienvenido!", "success");
         // Establece el estado para redirigir
         setRedirect(true);
         break;
     }
+  };
+
+  const mostrarNotificacion = (message, type) => {
+    toast[type](message);
   };
 
   // Redirige a "/Directores" si el estado de redirect es true
@@ -88,6 +94,19 @@ export default function Login() {
           </form>
         </div>
       </bodyt>
+
+      {/* Toastify container para las notificaciones */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }

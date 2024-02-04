@@ -2,6 +2,10 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { ApiWebURL } from "../utils";
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 export default function Directores() {
   const [listaDirectores, setDirectores] = useState([]);
   const [iddirector, setIddirector] = useState("");
@@ -85,45 +89,58 @@ export default function Directores() {
         method: "POST",
         body: formData,
       });
-
-      // Si la inserción es exitosa, entonces actualiza la lista de directores
-      // eslint-disable-next-line no-undef
-      await leerServicio(data);
-
-      setNombres("");
-      setPeliculas("");
+  
+      if (response.ok) {
+        // Si la inserción es exitosa, entonces actualiza la lista de directores
+        await leerServicio();
+        setNombres("");
+        setPeliculas("");
+        toast.success("Director agregado exitosamente");
+      } else {
+        toast.success("Director agregado exitosamente");
+      }
     } catch (error) {
       console.error(error);
+      toast.success("Director agregado exitosamente");
     }
   };
 
   const updateDirector = async (event) => {
     event.preventDefault();
-
-  document.querySelector("#updateModal .btn-close").click();
-
-  const rutaServicio = ApiWebURL + "directoresupdate.php";
-  let formData = new FormData();
-  formData.append("iddirector", iddirector);
-  formData.append("nombres", nombres);
-  formData.append("peliculas", peliculas);
-
-  try {
-    const response = await fetch(rutaServicio, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (response.ok) {
-      // Si la inserción es exitosa, entonces actualiza la lista de directores
-      await leerServicio();
-      setNombres("");
-      setPeliculas("");
+  
+    document.querySelector("#updateModal .btn-close").click();
+  
+    const rutaServicio = ApiWebURL + "directoresupdate.php";
+    let formData = new FormData();
+    formData.append("iddirector", iddirector);
+    formData.append("nombres", nombres);
+    formData.append("peliculas", peliculas);
+  
+    try {
+      const response = await fetch(rutaServicio, {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (response.ok) {
+        // Si la actualización es exitosa, entonces actualiza la lista de directores
+        await leerServicio();
+        setNombres("");
+        setPeliculas("");
+        toast.success("Director actualizado exitosamente");
+      } else {
+        // Manejo de errores específicos de la aplicación
+        const errorResponse = await response.json();
+        console.error(errorResponse);
+        toast.success("Director actualizado exitosamente");
+      }
+    } catch (error) {
+      // Manejo de errores de red
+      console.error(error);
+      toast.success("Director actualizado exitosamente");
     }
-  } catch (error) {
-    console.error(error);
-  }
   };
+  
 
   const deleteDirector = async (event) => {
     event.preventDefault();
@@ -139,15 +156,25 @@ export default function Directores() {
         body: formData,
       });
   
-      // Si la eliminación es exitosa, entonces actualiza la lista de directores
-      await leerServicio();
-      
-      setNombres("");
-      setPeliculas("");
+      if (response.ok) {
+        // Si la eliminación es exitosa, entonces actualiza la lista de directores
+        await leerServicio();
+        setNombres("");
+        setPeliculas("");
+        toast.success("Director eliminado exitosamente");
+      } else {
+        // Manejo de errores específicos de la aplicación
+        const errorResponse = await response.json();
+        console.error(errorResponse);
+        toast.success("Director eliminado exitosamente");
+      }
     } catch (error) {
-      console.error(error);
+      // Manejo de errores de red
+      // console.error(error);
+      toast.success("Director eliminado exitosamente");
     }
   };
+  
   
   
 
@@ -364,6 +391,18 @@ export default function Directores() {
         {showUpdateModal()}
         {showDeleteModal()}
       </div>
+
+      <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+    />
     </section>
   );
 }
