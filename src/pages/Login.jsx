@@ -1,18 +1,19 @@
+import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import "../style/Login.css";
 import { ApiWebURL } from "../utils";
 
 export default function Login() {
-  // Usa Navigate como componente JSX, no como función
-  const NavigateComponent = <Navigate to="/proveedores" replace={true} />;
+  const [redirect, setRedirect] = useState(false);
 
   const iniciarSesion = async (event) => {
     event.preventDefault();
 
     const dataForm = new FormData(event.currentTarget);
-
     const rutaServicio = ApiWebURL + "iniciarsesion.php";
+
     let formData = new FormData();
+
     formData.append("usuario", dataForm.get("usuario"));
     formData.append("clave", dataForm.get("clave"));
 
@@ -32,16 +33,21 @@ export default function Login() {
         break;
       default:
         alert("¡Bienvenido!");
-        // Utiliza NavigateComponent como un componente JSX
-        {NavigateComponent}
+        // Establece el estado para redirigir
+        setRedirect(true);
         break;
     }
   };
 
+  // Redirige a "/Directores" si el estado de redirect es true
+  if (redirect) {
+    return <Navigate to="/Directores" replace={true} />;
+  }
+
   return (
     <div>
-      <body className="d-flex w-100">
-        <div className="wrapper bg-danger items-center">
+      <bodyt className="d-flex w-100">
+        <div className="wrapper items-center">
           <form onSubmit={(event) => iniciarSesion(event)}>
             <h1>Ingresa tu cuenta</h1>
             <div className="input-box">
@@ -81,7 +87,7 @@ export default function Login() {
             </div>
           </form>
         </div>
-      </body>
+      </bodyt>
     </div>
   );
 }
