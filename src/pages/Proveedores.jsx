@@ -1,154 +1,136 @@
-import { useState, useEffect } from "react";
-import "../style/Proveedores.css";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import "../style/Proveedores.css"; // Usando CSS regular
 import { ApiWebURL } from "../utils";
 
+// Componente principal
 export default function Proveedores() {
-  // Estados para manejar el estado de carga, la lista original, la lista actual, el orden y el texto de búsqueda
   const [cargando, setCargando] = useState(true);
   const [listaProveedoresOriginal, setListaProveedoresOriginal] = useState([]);
-  const [listaProveedores, setListaProveedores] = useState([]);
-  const [ascendente, setAscendente] = useState(1);
   const [textoBuscar, setTextoBuscar] = useState("");
+  const [ascendente, setAscendente] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Efecto de montaje que llama a leerServicio después de 3 segundos
+  // Obtener datos del servicio
   useEffect(() => {
-    setTimeout(() => {
-      leerServicio();
-    }, 3000);
+    const leerServicio = async () => {
+      try {
+        const response = await fetch(`${ApiWebURL}proveedores.php`);
+        const data = await response.json();
+        setListaProveedoresOriginal(data);
+      } catch (error) {
+        console.error("Error al cargar los proveedores:", error);
+      } finally {
+        setCargando(false);
+      }
+    };
+    leerServicio();
   }, []);
 
-  // Función asincrónica para obtener datos del servicio y actualizar los estados
-  const leerServicio = async () => {
-    const rutaServicio = ApiWebURL + "proveedores.php";
-    const response = await fetch(rutaServicio);
-    const data = await response.json();
-    setListaProveedoresOriginal(data);
-    setListaProveedores(data);
-    setCargando(false);
-  };
+  // Manejo del cambio en el texto de búsqueda
+  const handleSearchChange = useCallback((event) => {
+    setTextoBuscar(event.target.value.toLowerCase());
+    setCurrentPage(1); // Reinicia la página al cambiar el filtro de búsqueda
+  }, []);
 
-    // Función para manejar el cambio de página
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  // Función que devuelve el componente de carga
-  const dibujarPreCarga = () => {
-    return (
-      <div className="lds-ripple text-center">
-        <div></div>
-        <div></div>
-      </div>
+  // Ordenación y filtrado de la lista de proveedores
+  const listaFiltradaYOrdenada = useMemo(() => {
+    const filtrada = listaProveedoresOriginal.filter((item) =>
+      item.nombreempresa.toLowerCase().startsWith(textoBuscar)
     );
-  };
 
-  // Función que verifica si un valor es numérico
-  const isNumeric = (value) => {
-    return /^\d+$/.test(value);
-  };
-
-  // Función para manejar el clic en las columnas para ordenar la lista
-  const seleccionarColumna = (event) => {
-    const columnaSeleccionada = event.target.getAttribute("columna");
-    setAscendente((prevAscendente) => -prevAscendente);
-
-    // Ordena la lista de proveedores según la columna seleccionada y el orden ascendente/descendente
-    const sortedProveedores = listaProveedores.slice().sort((a, b) => {
-      const valorA = a[columnaSeleccionada];
-      const valorB = b[columnaSeleccionada];
-
-      if (isNumeric(valorA) && isNumeric(valorB)) {
-        const numeroA = parseInt(valorA);
-        const numeroB = parseInt(valorB);
-
-        if (numeroA < numeroB) {
-          return ascendente;
-        } else if (numeroA > numeroB) {
-          return -ascendente;
-        }
-      } else {
-        if (valorA < valorB) {
-          return ascendente;
-        } else if (valorA > valorB) {
-          return -ascendente;
-        }
-      }
-      return 0;
+    const ordenada = filtrada.sort((a, b) => {
+      const valorA = a.nombreempresa;
+      const valorB = b.nombreempresa;
+      return ascendente ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
     });
 
-    // Actualiza la lista de proveedores con la nueva ordenación
-    setListaProveedores(sortedProveedores);
-  };
+    return ordenada;
+  }, [listaProveedoresOriginal, textoBuscar, ascendente]);
 
-  // Función para manejar el cambio en el texto de búsqueda
-  const buscarTexto = (event) => {
-    let textoB = event.target.value;
-    setTextoBuscar(textoB);
-
-    // Filtra la lista original basada en el texto de búsqueda (coincidencia de inicio)
-    const resultado = listaProveedoresOriginal.filter((item) =>
-      item["nombreempresa"].toLowerCase().startsWith(textoB.toLowerCase())
-    );
-
-    // Actualiza la lista de proveedores con el resultado de la búsqueda
-    setListaProveedores(resultado);
-  };
-
-  // Función que devuelve el componente de la tabla
-  const dibujarTabla = () => {
-    // Calcula los índices de inicio y fin para la página actual
+  // Obtener los proveedores de la página actual
+  const currentItems = useMemo(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = listaProveedores.slice(indexOfFirstItem, indexOfLastItem);
-  
+    return listaFiltradaYOrdenada.slice(indexOfFirstItem, indexOfLastItem);
+  }, [currentPage, listaFiltradaYOrdenada]);
+
+  // Manejo del cambio de página
+  const handlePageChange = useCallback((pageNumber) => {
+    setCurrentPage(pageNumber);
+  }, []);
+
+  // Alternar el orden ascendente/descendente
+  const toggleAscendente = useCallback(() => {
+    setAscendente((prev) => !prev);
+  }, []);
+
+  // Componente de la tabla de proveedores
+  const TablaProveedores = () => (
+    <table className="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th onClick={toggleAscendente} style={{ cursor: "pointer" }}>
+            Empresa {ascendente ? "↑" : "↓"}
+          </th>
+          <th>Contacto</th>
+          <th>Cargo</th>
+          <th>Ciudad</th>
+        </tr>
+      </thead>
+      <tbody>
+        {currentItems.map((item) => (
+          <tr key={item.idproveedor}>
+            <td>{item.idproveedor}</td>
+            <td>{item.nombreempresa}</td>
+            <td>{item.nombrecontacto}</td>
+            <td>{item.cargocontacto}</td>
+            <td>{item.ciudad}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+  // Componente de paginación
+  const Paginacion = () => {
+    const totalPages = Math.ceil(listaFiltradaYOrdenada.length / itemsPerPage);
     return (
-      <div>
-        <table className="table table-striped table-hover">
-          {/* ... (tu encabezado de tabla aquí) */}
-          <tbody>
-            {currentItems.map((item) => (
-              <tr key={item.idproveedor}>
-                <td>{item.idproveedor}</td>
-                <td>{item.nombreempresa}</td>
-                <td>{item.nombrecontacto}</td>
-                <td>{item.cargocontacto}</td>
-                <td>{item.ciudad}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-  
-        {/* Agrega la paginación */}
-        <ul className="pagination">
-          {Array(Math.ceil(listaProveedores.length / itemsPerPage)).fill().map((_, index) => (
-            <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-              <button onClick={() => handlePageChange(index + 1)} className="page-link">
-                {index + 1}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ul className="pagination">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
+            <button onClick={() => handlePageChange(index + 1)} className="page-link">
+              {index + 1}
+            </button>
+          </li>
+        ))}
+      </ul>
     );
   };
 
-  // Componente principal que renderiza la sección de proveedores
   return (
-    <section className="paddi">
+    <section className="proveedores-section">
       <div className="container">
         <h2 className="py-4">Proveedores</h2>
-        {/* Input para ingresar el texto de búsqueda */}
         <input
           value={textoBuscar}
-          onChange={(event) => buscarTexto(event)}
+          onChange={handleSearchChange}
           type="text"
           className="form-control my-4"
-          placeholder="Indique expresión a buscar por empresa"
+          placeholder="Buscar empresa"
         />
-        {/* Condicional para mostrar la carga o la tabla según el estado 'cargando' */}
-        {cargando === true ? dibujarPreCarga() : dibujarTabla()}
+        {cargando ? (
+          <div className="lds-ripple text-center py-5">
+            <div></div>
+            <div></div>
+          </div>
+        ) : (
+          <>
+            <TablaProveedores />
+            <Paginacion />
+          </>
+        )}
       </div>
     </section>
   );

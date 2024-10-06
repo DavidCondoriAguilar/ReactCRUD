@@ -1,14 +1,13 @@
 import "./MainHeader.css";
 
-
 function MainHeader() {
   return (
-<header id="main-header">
+    <header id="main-header">
       <div className="container">
         <h1>Ecommerce React Vite</h1>
       </div>
-    </header> 
-  )
+    </header>
+  );
 }
 
-export default MainHeader
+export default MainHeader;

@@ -2,9 +2,8 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { ApiWebURL } from "../utils";
 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Directores() {
   const [listaDirectores, setDirectores] = useState([]);
@@ -89,7 +88,7 @@ export default function Directores() {
         method: "POST",
         body: formData,
       });
-  
+
       if (response.ok) {
         // Si la inserción es exitosa, entonces actualiza la lista de directores
         await leerServicio();
@@ -107,21 +106,21 @@ export default function Directores() {
 
   const updateDirector = async (event) => {
     event.preventDefault();
-  
+
     document.querySelector("#updateModal .btn-close").click();
-  
+
     const rutaServicio = ApiWebURL + "directoresupdate.php";
     let formData = new FormData();
     formData.append("iddirector", iddirector);
     formData.append("nombres", nombres);
     formData.append("peliculas", peliculas);
-  
+
     try {
       const response = await fetch(rutaServicio, {
         method: "POST",
         body: formData,
       });
-  
+
       if (response.ok) {
         // Si la actualización es exitosa, entonces actualiza la lista de directores
         await leerServicio();
@@ -140,24 +139,24 @@ export default function Directores() {
       toast.success("Director actualizado exitosamente");
     }
   };
-  
 
   const deleteDirector = async (event) => {
     event.preventDefault();
     document.querySelector("#deleteModal .btn-close").click();
-  
+
     const rutaServicio = ApiWebURL + "directoresdelete.php";
     let formData = new FormData();
     formData.append("iddirector", iddirector);
-  
+
     try {
       const response = await fetch(rutaServicio, {
         method: "POST",
         body: formData,
       });
-  
+
       if (response.ok) {
         // Si la eliminación es exitosa, entonces actualiza la lista de directores
+        // eslint-disable-next-line no-undef
         await leerServicio();
         setNombres("");
         setPeliculas("");
@@ -166,17 +165,14 @@ export default function Directores() {
         // Manejo de errores específicos de la aplicación
         const errorResponse = await response.json();
         console.error(errorResponse);
-        toast.success("Director eliminado exitosamente");
+        toast.error("Negativo");
       }
     } catch (error) {
       // Manejo de errores de red
       // console.error(error);
-      toast.success("Director eliminado exitosamente");
+      toast.error("Negativo");
     }
   };
-  
-  
-  
 
   const itemEliminar = (item) => {
     setIddirector(item.iddirector);
@@ -217,7 +213,7 @@ export default function Directores() {
                     onChange={(event) => setNombres(event.target.value)}
                   />
                 </div>
-  
+
                 <div className="mb-3">
                   <input
                     type="text"
@@ -270,7 +266,7 @@ export default function Directores() {
                 aria-label="Close"
               ></button>
             </div>
-  
+
             <form onSubmit={(event) => updateDirector(event)}>
               <div className="modal-body">
                 <div className="mb-3">
@@ -282,7 +278,7 @@ export default function Directores() {
                     onChange={(event) => setIddirector(event.target.value)}
                   />
                 </div>
-  
+
                 <div className="mb-3">
                   <input
                     type="text"
@@ -293,7 +289,7 @@ export default function Directores() {
                     onChange={(event) => setNombres(event.target.value)}
                   />
                 </div>
-  
+
                 <div className="mb-3">
                   <input
                     type="text"
@@ -346,7 +342,7 @@ export default function Directores() {
                 aria-label="Close"
               ></button>
             </div>
-  
+
             <form onSubmit={(event) => deleteDirector(event)}>
               <div className="modal-body">
                 <div className="mb-3">
@@ -361,7 +357,7 @@ export default function Directores() {
                 >
                   Cerrar
                 </button>
-                <button type="submit" className="btn btn-primary" >
+                <button type="submit" className="btn btn-primary">
                   Eliminar
                 </button>
               </div>
@@ -393,16 +389,16 @@ export default function Directores() {
       </div>
 
       <ToastContainer
-      position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-    />
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </section>
   );
 }

@@ -84,7 +84,7 @@ export default function Login() {
             />
             <label>Mostrar contraseña</label>
             <button type="submit" className="btn">
-              Login
+              Ingresar
             </button>
             <div className="register-link">
               <p>

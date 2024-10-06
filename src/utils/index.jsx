@@ -1,6 +1,6 @@
 export const ApiWebURL = "https://servicios.campus.pe/";
 
-export const agregarCarrito = (item,cantidad) => {
+export const agregarCarrito = (item, cantidad) => {
   //IMPORTANTE
   item.cantidad = cantidad == null ? 1 : cantidad;
 
@@ -14,7 +14,7 @@ export const agregarCarrito = (item,cantidad) => {
   if (sessionStorage.getItem("carritocompras")) {
     carrito = JSON.parse(sessionStorage.getItem("carritocompras"));
     let index = -1;
-
+    
     for (let i = 0; i < carrito.length; i++) {
       if (item.idproducto === carrito[i].idproducto) {
         index = i;
