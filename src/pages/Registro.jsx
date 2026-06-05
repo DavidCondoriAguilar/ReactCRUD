@@ -5,60 +5,38 @@ import { apiClient } from "../services/api";
 import { motion } from "framer-motion";
 import PageTransition from "../components/ui/PageTransition";
 import "react-toastify/dist/ReactToastify.css";
-import "./Login.css";
+import "./Login.css"; // Reutilizamos los estilos minimalistas
 
-export default function Login() {
-  const [usuario, setUsuario] = useState("test7");
-  const [clave, setClave] = useState("test7");
+export default function Registro() {
+  const [nombre, setNombre] = useState("");
+  const [usuario, setUsuario] = useState("");
+  const [clave, setClave] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const [cargando, setCargando] = useState(false);
 
-  const iniciarSesion = async (event) => {
+  const registrarUsuario = async (event) => {
     event.preventDefault();
-    if (!usuario.trim() || !clave.trim()) {
-      toast.warning("Por favor ingresa tu usuario y contraseña");
+    if (!nombre.trim() || !usuario.trim() || !clave.trim()) {
+      toast.warning("Por favor completa todos los campos");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("usuario", usuario);
-    formData.append("clave", clave);
-
-    try {
-      setCargando(true);
-      const result = await apiClient.post("iniciarsesion.php", formData);
-
-      switch (Number(result)) {
-        case -1:
-          toast.error("El usuario no está registrado");
-          break;
-        case -2:
-          toast.error("La contraseña es incorrecta");
-          break;
-        default:
-          toast.success("Acceso autorizado");
-          setTimeout(() => {
-            setRedirect(true);
-          }, 1000);
-          break;
-      }
-    } catch (error) {
-      console.error("Error al iniciar sesión:", error);
-      toast.error("Error de conexión al servidor");
-    } finally {
+    // Aquí iría el endpoint real de registro (ej. "registro.php")
+    // Como es un demo, simularemos el comportamiento de registro
+    setCargando(true);
+    
+    setTimeout(() => {
       setCargando(false);
-    }
-  };
-
-  const autoFillDemo = () => {
-    setUsuario("test7");
-    setClave("test7");
-    toast.info("Credenciales de demo cargadas");
+      toast.success("Cuenta creada exitosamente (Modo Demo)");
+      setTimeout(() => {
+        setRedirect(true);
+      }, 1500);
+    }, 1200);
   };
 
   if (redirect) {
-    return <Navigate to="/directores" replace={true} />;
+    return <Navigate to="/login" replace={true} />;
   }
 
   return (
@@ -74,15 +52,28 @@ export default function Login() {
             
             <div className="login-header">
               <h2 className="login-logo">Aether</h2>
-              <span className="login-subtitle">Corporate Access</span>
+              <span className="login-subtitle">New Corporate Profile</span>
             </div>
 
-            <form onSubmit={iniciarSesion}>
+            <form onSubmit={registrarUsuario}>
+              
               <div className="login-input-box">
                 <input
                   type="text"
                   className="login-input"
-                  placeholder="Usuario"
+                  placeholder="Nombre completo"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  required
+                />
+                <i className="bi bi-person-badge login-icon"></i>
+              </div>
+
+              <div className="login-input-box">
+                <input
+                  type="text"
+                  className="login-input"
+                  placeholder="Nombre de Usuario"
                   value={usuario}
                   onChange={(e) => setUsuario(e.target.value)}
                   required
@@ -116,8 +107,8 @@ export default function Login() {
                   </label>
                 </div>
                 
-                <Link to="/registro" className="login-check-label text-decoration-none" style={{ fontWeight: 500 }}>
-                  Crear cuenta
+                <Link to="/login" className="login-check-label text-decoration-none" style={{ fontWeight: 500 }}>
+                  Ya tengo cuenta
                 </Link>
               </div>
 
@@ -126,24 +117,16 @@ export default function Login() {
                 className="login-btn"
                 disabled={cargando}
               >
-                {cargando ? "Accediendo..." : "Ingresar"}
+                {cargando ? "Registrando..." : "Crear Perfil"}
               </button>
               
-              <div className="test-environment-notice">
+              <div className="test-environment-notice mt-4">
                 <div className="test-notice-title">
-                  <i className="bi bi-shield-check me-2"></i>Entorno de Prueba Seguro
+                  <i className="bi bi-info-circle me-2"></i>Aviso de Demo
                 </div>
-                <p className="test-notice-text mb-2">
-                  Esta plataforma es una demostración técnica profesional. Las credenciales de prueba otorgan acceso a un entorno simulado de gestión de boutique y estudios. <strong>No ingrese datos personales reales.</strong>
+                <p className="test-notice-text">
+                  El registro es simulado en este entorno de prueba para evitar el almacenamiento de datos reales en la base de datos de exhibición.
                 </p>
-                <div 
-                  className="bg-light border p-2 mt-2" 
-                  style={{ cursor: "pointer", fontSize: "0.7rem", letterSpacing: "0.05em", color: "#000" }}
-                  onClick={autoFillDemo}
-                  title="Clic para autocompletar"
-                >
-                  <strong>CREDENCIALES DEMO:</strong> test7 / test7
-                </div>
               </div>
             </form>
 

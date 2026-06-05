@@ -1,0 +1,233 @@
+.main-banner {
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - 56px);
+  min-height: calc(100dvh - 56px);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.banner-slider {
+  display: flex;
+  width: 400%; /* 4 slides * 100% */
+  height: 100%;
+  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.banner-slide {
+  min-width: 25%; /* 100% / 4 */
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.3),
+    rgba(15, 23, 42, 0.7)
+  );
+  z-index: 1;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  color: white;
+  text-align: center;
+  padding: 0 2rem;
+  max-width: 800px;
+}
+
+.banner-tag {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: inline-block;
+  background: rgba(2, 132, 199, 0.2);
+  color: #38bdf8;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.banner-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.banner-description {
+  font-size: 1.25rem;
+  font-weight: 300;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.banner-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  color: white;
+  background: rgba(2, 132, 199, 0.2);
+  padding: 0.9rem 2rem;
+  border-radius: 50px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.banner-button:hover {
+  background: rgba(2, 132, 199, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(2, 132, 199, 0.2);
+}
+
+.button-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.banner-button:hover .button-arrow {
+  transform: translateX(4px);
+}
+
+.banner-navigation {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  z-index: 10;
+}
+
+.banner-nav-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.banner-nav-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.banner-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.banner-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.banner-dot.active {
+  background: white;
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .banner-title {
+    font-size: 2.8rem;
+  }
+  
+  .banner-description {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-banner {
+    height: auto;
+    min-height: 80vh;
+  }
+  
+  .banner-slider {
+    width: 300%; /* 3 slides visible at a time on mobile */
+  }
+  
+  .banner-slide {
+    min-width: 33.33%; /* 3 slides */
+  }
+  
+  .banner-content {
+    padding: 0 1.5rem;
+    text-align: center;
+  }
+  
+  .banner-title {
+    font-size: 2.2rem;
+  }
+  
+  .banner-description {
+    font-size: 1rem;
+  }
+  
+  .banner-navigation {
+    bottom: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-title {
+    font-size: 1.8rem;
+  }
+  
+  .banner-tag {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+  }
+  
+  .banner-description {
+    font-size: 0.9rem;
+  }
+  
+  .banner-button {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}

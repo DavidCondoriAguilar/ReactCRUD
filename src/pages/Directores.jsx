@@ -1,404 +1,136 @@
 import { useEffect } from "react";
-import { useState } from "react";
-import { ApiWebURL } from "../utils";
-
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import { motion, AnimatePresence } from "framer-motion";
+import PageTransition from "../components/ui/PageTransition";
+import DirectorModals from "../features/directors/DirectorModals";
+import { useDirectorCrud } from "../features/directors/useDirectorCrud";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Directores() {
-  const [listaDirectores, setDirectores] = useState([]);
-  const [iddirector, setIddirector] = useState("");
-  const [nombres, setNombres] = useState("");
-  const [peliculas, setPeliculas] = useState("");
+  const {
+    listaDirectores, cargando,
+    form, modal,
+    prepararInsertar, prepararEditar, prepararEliminar,
+    handleInsert, handleUpdate, handleDelete,
+    leerServicio,
+  } = useDirectorCrud();
 
   useEffect(() => {
-    const leerServicio = async () => {
-      const rutaServicio = ApiWebURL + "directores.php";
-
-      try {
-        const response = await fetch(rutaServicio);
-        const data = await response.json();
-        setDirectores(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     leerServicio();
-  }, [listaDirectores]); // actualiza el estado del POST
+  }, [leerServicio]);
 
   const dibujarTablaDirectores = () => (
-    <div>
-      <table className="table table-striped table-hover">
+    <div className="table-responsive card border-0 shadow-sm overflow-hidden bg-white">
+      <table className="table table-striped table-hover align-middle mb-0">
         <thead>
           <tr>
             <th>ID Director</th>
             <th>Nombres</th>
             <th>Películas</th>
+            <th className="text-center" style={{ width: "120px" }}>Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          {listaDirectores.map((item) => (
-            <tr key={item.iddirector}>
-              <td>{item.iddirector}</td>
-              <td>{item.nombres}</td>
-              <td>{item.peliculas}</td>
-              <td>
-                <i
-                  className="bi bi-pencil-fill "
-                  onClick={() => llenarCampos(item)}
-                  data-bs-toggle="modal"
-                  data-bs-target="#updateModal"
-                  title="Editar"
-                ></i>
-              </td>
-              <td>
-                <i
-                  className="bi bi-x-lg"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteModal"
-                  title="Eliminar"
-                  onClick={() => itemEliminar(item)}
-                ></i>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+        <motion.tbody 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <AnimatePresence>
+            {listaDirectores.map((item) => (
+              <motion.tr 
+                key={item.iddirector}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <td>{item.iddirector}</td>
+                <td className="fw-semibold text-dark">{item.nombres}</td>
+                <td>{item.peliculas}</td>
+                <td className="text-center">
+                  <div className="d-flex justify-content-center gap-3">
+                    <i
+                      className="bi bi-pencil-fill text-primary fs-5"
+                      style={{ cursor: "pointer", transition: "transform 0.2s" }}
+                      onClick={() => prepararEditar(item)}
+                      title="Editar"
+                      onMouseOver={(e) => e.target.style.transform = "scale(1.15)"}
+                      onMouseOut={(e) => e.target.style.transform = "scale(1)"}
+                    ></i>
+                    <i
+                      className="bi bi-x-lg text-danger fs-5"
+                      style={{ cursor: "pointer", transition: "transform 0.2s" }}
+                      onClick={() => prepararEliminar(item)}
+                      title="Eliminar"
+                      onMouseOver={(e) => e.target.style.transform = "scale(1.15)"}
+                      onMouseOut={(e) => e.target.style.transform = "scale(1)"}
+                    ></i>
+                  </div>
+                </td>
+              </motion.tr>
+            ))}
+          </AnimatePresence>
+        </motion.tbody>
       </table>
     </div>
   );
 
-  const llenarCampos = (item) => {
-    setIddirector(item.iddirector);
-    setNombres(item.nombres);
-    setPeliculas(item.peliculas);
-  };
-
-  const insertDirector = async (event) => {
-    event.preventDefault();
-    document.querySelector("#exampleModal .btn-close").click();
-
-    const rutaServicio = ApiWebURL + "directoresinsert.php";
-    let formData = new FormData();
-    formData.append("nombres", nombres);
-    formData.append("peliculas", peliculas);
-
-    try {
-      const response = await fetch(rutaServicio, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        // Si la inserción es exitosa, entonces actualiza la lista de directores
-        await leerServicio();
-        setNombres("");
-        setPeliculas("");
-        toast.success("Director agregado exitosamente");
-      } else {
-        toast.success("Director agregado exitosamente");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.success("Director agregado exitosamente");
-    }
-  };
-
-  const updateDirector = async (event) => {
-    event.preventDefault();
-
-    document.querySelector("#updateModal .btn-close").click();
-
-    const rutaServicio = ApiWebURL + "directoresupdate.php";
-    let formData = new FormData();
-    formData.append("iddirector", iddirector);
-    formData.append("nombres", nombres);
-    formData.append("peliculas", peliculas);
-
-    try {
-      const response = await fetch(rutaServicio, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        // Si la actualización es exitosa, entonces actualiza la lista de directores
-        await leerServicio();
-        setNombres("");
-        setPeliculas("");
-        toast.success("Director actualizado exitosamente");
-      } else {
-        // Manejo de errores específicos de la aplicación
-        const errorResponse = await response.json();
-        console.error(errorResponse);
-        toast.success("Director actualizado exitosamente");
-      }
-    } catch (error) {
-      // Manejo de errores de red
-      console.error(error);
-      toast.success("Director actualizado exitosamente");
-    }
-  };
-
-  const deleteDirector = async (event) => {
-    event.preventDefault();
-    document.querySelector("#deleteModal .btn-close").click();
-
-    const rutaServicio = ApiWebURL + "directoresdelete.php";
-    let formData = new FormData();
-    formData.append("iddirector", iddirector);
-
-    try {
-      const response = await fetch(rutaServicio, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        // Si la eliminación es exitosa, entonces actualiza la lista de directores
-        // eslint-disable-next-line no-undef
-        await leerServicio();
-        setNombres("");
-        setPeliculas("");
-        toast.success("Director eliminado exitosamente");
-      } else {
-        // Manejo de errores específicos de la aplicación
-        const errorResponse = await response.json();
-        console.error(errorResponse);
-        toast.error("Negativo");
-      }
-    } catch (error) {
-      // Manejo de errores de red
-      // console.error(error);
-      toast.error("Negativo");
-    }
-  };
-
-  const itemEliminar = (item) => {
-    setIddirector(item.iddirector);
-    setNombres(item.nombres);
-  };
-
-  const showInsertModal = () => {
-    return (
-      <div
-        className="modal fade"
-        id="exampleModal"
-        tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Nuevo Director
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <form onSubmit={(event) => insertDirector(event)}>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre del Director"
-                    value={nombres}
-                    required
-                    onChange={(event) => setNombres(event.target.value)}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre de la Película"
-                    value={peliculas}
-                    required
-                    onChange={(event) => setPeliculas(event.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Cerrar
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Guardar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const showUpdateModal = () => {
-    return (
-      <div
-        className="modal fade"
-        id="updateModal"
-        tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Actualizar Director
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-
-            <form onSubmit={(event) => updateDirector(event)}>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={iddirector}
-                    readOnly
-                    onChange={(event) => setIddirector(event.target.value)}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre del Director"
-                    value={nombres}
-                    required
-                    onChange={(event) => setNombres(event.target.value)}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre de la Película"
-                    value={peliculas}
-                    required
-                    onChange={(event) => setPeliculas(event.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Cerrar
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Guardar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const showDeleteModal = () => {
-    return (
-      <div
-        className="modal fade"
-        id="deleteModal"
-        tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Eliminar Director
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-
-            <form onSubmit={(event) => deleteDirector(event)}>
-              <div className="modal-body">
-                <div className="mb-3">
-                  Estas seguro de eliminar el director {nombres}?
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Cerrar
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Eliminar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <section className="paddi">
-      <div className="container">
-        <h2 className="py-4">Directores</h2>
-        <div className="mb-3">
-          <button
-            type="button"
-            className="btn btn-success"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-          >
-            Agregar nuevo Director
-          </button>
-        </div>
-        {dibujarTablaDirectores()}
-        {showInsertModal()}
-        {showUpdateModal()}
-        {showDeleteModal()}
-      </div>
+    <PageTransition>
+      <section className="paddi">
+        <div className="container">
+          <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-5">
+            <div>
+              <span className="text-primary fw-semibold text-uppercase tracking-wider fs-7">Administración</span>
+              <h1 className="mt-1 mb-2 fw-bold text-dark">Directores de Cine</h1>
+              <p className="text-muted mb-0" style={{ maxWidth: "600px" }}>
+                Gestión y registro en tiempo real de los directores cinematográficos asociados y sus principales obras.
+              </p>
+            </div>
+            <div>
+              <button
+                type="button"
+                className="btn btn-success d-flex align-items-center gap-2 py-2 px-3 shadow-sm"
+                onClick={prepararInsertar}
+              >
+                <i className="bi bi-plus-lg"></i> Agregar Director
+              </button>
+            </div>
+          </div>
 
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-    </section>
+          {cargando ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-success" role="status">
+                <span className="visually-hidden">Cargando directores...</span>
+              </div>
+            </div>
+          ) : listaDirectores.length === 0 ? (
+            <div className="alert alert-info text-center py-4">No hay directores registrados.</div>
+          ) : (
+            dibujarTablaDirectores()
+          )}
+        </div>
+
+        <DirectorModals
+          form={form}
+          modal={modal}
+          handleInsert={handleInsert}
+          handleUpdate={handleUpdate}
+          handleDelete={handleDelete}
+        />
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </section>
+    </PageTransition>
   );
 }

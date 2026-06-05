@@ -1,69 +1,119 @@
-// Importamos los hooks necesarios de React
-import { useEffect } from "react";
-import { useState } from "react";
-import { ApiWebURL } from "../utils";
+import { useEffect, useState, useCallback } from "react";
+import { apiClient } from "../services/api";
+import { ApiWebURL } from "../config/constants";
+import { motion } from "framer-motion";
+import PageTransition from "../components/ui/PageTransition";
 
-// Definimos el componente Empleados
 export default function Empleados() {
-  // Creamos un estado llamado listaEmpleados y una función setEmpleados para actualizarlo.
   const [listaEmpleados, setEmpleados] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
-  // Utilizamos el hook useEffect para hacer una llamada a una API al cargar el componente.
+  const leerServicio = useCallback(async () => {
+    try {
+      setCargando(true);
+      const data = await apiClient.get("empleados.php");
+      setEmpleados(data);
+    } catch (error) {
+      console.error("Error al obtener los empleados:", error);
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
   useEffect(() => {
-    // Definimos una función asincrónica llamada leerServicio.
-    const leerServicio = async () => {
-      // URL del servicio que contiene los datos de los empleados.
-      const rutaServicio = ApiWebURL + "empleados.php";
-
-      try {
-        // Hacemos una solicitud a la API usando fetch.
-        const response = await fetch(rutaServicio);
-        // Convertimos la respuesta a formato JSON.
-        const data = await response.json();
-        // Actualizamos el estado listaEmpleados con los datos obtenidos.
-        setEmpleados(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    // Llamamos a la función leerServicio para obtener los datos de la API.
     leerServicio();
-  }, []); // El segundo argumento (un array vacío) asegura que useEffect solo se ejecute una vez al cargar el componente.
+  }, [leerServicio]);
 
-  // Definimos una función llamada dibujarCuadricula que renderiza la información de los empleados en una cuadrícula.
+  // Contenedor para animaciones escalonadas
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+        delayChildren: 0.05,
+      },
+    },
+  };
+
+  // Tarjeta de empleado individual
+  const cardVariants = {
+    hidden: { opacity: 0, y: 15, scale: 0.95 },
+    show: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 80,
+        damping: 15,
+      },
+    },
+  };
+
   const dibujarCuadricula = () => {
+    if (listaEmpleados.length === 0) {
+      return <div className="alert alert-info text-center w-100">No hay empleados registrados.</div>;
+    }
+
     return (
-      <div className="row row-cols-1 row-cols-md-5 align-items-center ">
-        {/* Iteramos a través de la lista de empleados y generamos una tarjeta para cada uno. */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 justify-content-center"
+      >
         {listaEmpleados.map((item) => (
-          <div className="col py-2" key={item.idempleado}>
-            <div className="card h-100 ">
+          <motion.div variants={cardVariants} className="col" key={item.idempleado}>
+            <div className="card h-100 shadow-sm border-0">
               <img
-                src={ApiWebURL +"fotos/" + item.foto}
-                className="card-img-top img-fluid text-center"
+                src={`${ApiWebURL}${item.foto}`}
+                className="card-img-top"
                 alt={`Foto de ${item.nombres} ${item.apellidos}`}
-                style={{ width: "350px", height: "300px" }}
+                style={{ height: "260px", objectFit: "cover", objectPosition: "top center" }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "https://placehold.co/300x260?text=Sin+Foto";
+                }}
               />
-              <div className="card-body">
-                <h5 className="card-title">{item.cargo}</h5>
-                <p className="card-text">
-                  {item.nombres} {item.apellidos}
-                </p>
+              <div className="card-body p-3 d-flex flex-column justify-content-between bg-white" style={{ zIndex: 1 }}>
+                <div>
+                  <h6 className="card-title text-success fw-bold mb-1" style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{item.cargo}</h6>
+                  <p className="card-text text-dark fw-semibold mb-0" style={{ fontSize: "0.95rem" }}>
+                    {item.nombres} {item.apellidos}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     );
   };
 
   return (
-    <section className="paddi">
-      <div className="container">
-        <h2 className="py-4">Empleados</h2>
-        {dibujarCuadricula()}
-      </div>
-    </section>
+    <PageTransition>
+      <section className="paddi">
+        <div className="container">
+          <div className="mb-5">
+            <span className="text-primary fw-semibold text-uppercase tracking-wider fs-7">Corporate Crew & Talent</span>
+            <h1 className="mt-1 mb-2 fw-bold text-dark">Directorio de Equipo</h1>
+            <p className="text-muted" style={{ maxWidth: "600px" }}>
+              Conoce al equipo multidisciplinario detrás de cámaras que hace posible cada superproducción y la expansión corporativa de AETHER Entertainment.
+            </p>
+          </div>
+          
+          {cargando ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-success" role="status">
+                <span className="visually-hidden">Cargando empleados...</span>
+              </div>
+            </div>
+          ) : (
+            dibujarCuadricula()
+          )}
+        </div>
+      </section>
+    </PageTransition>
   );
 }

@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import "../style/Proveedores.css"; // Usando CSS regular
-import { ApiWebURL } from "../utils";
+import { apiClient } from "../services/api";
+import { motion, AnimatePresence } from "framer-motion";
+import PageTransition from "../components/ui/PageTransition";
+import "./Proveedores.css"; // Usando CSS regular
 
 // Componente principal
 export default function Proveedores() {
@@ -11,12 +13,12 @@ export default function Proveedores() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Obtener datos del servicio
+  // Obtener datos del servicio utilizando apiClient
   useEffect(() => {
     const leerServicio = async () => {
       try {
-        const response = await fetch(`${ApiWebURL}proveedores.php`);
-        const data = await response.json();
+        setCargando(true);
+        const data = await apiClient.get("proveedores.php");
         setListaProveedoresOriginal(data);
       } catch (error) {
         console.error("Error al cargar los proveedores:", error);
@@ -40,8 +42,8 @@ export default function Proveedores() {
     );
 
     const ordenada = filtrada.sort((a, b) => {
-      const valorA = a.nombreempresa;
-      const valorB = b.nombreempresa;
+      const valorA = a.nombreempresa || "";
+      const valorB = b.nombreempresa || "";
       return ascendente ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
     });
 
@@ -67,71 +69,116 @@ export default function Proveedores() {
 
   // Componente de la tabla de proveedores
   const TablaProveedores = () => (
-    <table className="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th onClick={toggleAscendente} style={{ cursor: "pointer" }}>
-            Empresa {ascendente ? "↑" : "↓"}
-          </th>
-          <th>Contacto</th>
-          <th>Cargo</th>
-          <th>Ciudad</th>
-        </tr>
-      </thead>
-      <tbody>
-        {currentItems.map((item) => (
-          <tr key={item.idproveedor}>
-            <td>{item.idproveedor}</td>
-            <td>{item.nombreempresa}</td>
-            <td>{item.nombrecontacto}</td>
-            <td>{item.cargocontacto}</td>
-            <td>{item.ciudad}</td>
+    <div className="table-responsive card border-0 shadow-sm overflow-hidden bg-white">
+      <table className="table table-striped table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th onClick={toggleAscendente} style={{ cursor: "pointer", userSelect: "none" }}>
+              Empresa {ascendente ? "↑" : "↓"}
+            </th>
+            <th>Contacto</th>
+            <th>Cargo</th>
+            <th>Ciudad</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <motion.tbody 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          {currentItems.map((item) => (
+            <tr key={item.idproveedor}>
+              <td>{item.idproveedor}</td>
+              <td className="fw-semibold text-dark">{item.nombreempresa}</td>
+              <td>{item.nombrecontacto}</td>
+              <td>{item.cargocontacto}</td>
+              <td>{item.ciudad}</td>
+            </tr>
+          ))}
+        </motion.tbody>
+      </table>
+    </div>
   );
 
   // Componente de paginación
   const Paginacion = () => {
     const totalPages = Math.ceil(listaFiltradaYOrdenada.length / itemsPerPage);
+    if (totalPages <= 1) return null;
+    
     return (
-      <ul className="pagination">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
-            <button onClick={() => handlePageChange(index + 1)} className="page-link">
-              {index + 1}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <nav aria-label="Page navigation">
+        <ul className="pagination justify-content-center mt-4 mb-0">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
+              <button onClick={() => handlePageChange(index + 1)} className="page-link shadow-none">
+                {index + 1}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
     );
   };
 
   return (
-    <section className="proveedores-section">
-      <div className="container">
-        <h2 className="py-4">Proveedores</h2>
-        <input
-          value={textoBuscar}
-          onChange={handleSearchChange}
-          type="text"
-          className="form-control my-4"
-          placeholder="Buscar empresa"
-        />
-        {cargando ? (
-          <div className="lds-ripple text-center py-5">
-            <div></div>
-            <div></div>
+    <PageTransition>
+      <section className="proveedores-section paddi">
+        <div className="container">
+          <div className="mb-5">
+            <span className="text-primary fw-semibold text-uppercase tracking-wider fs-7">Partners & Studios</span>
+            <h1 className="mt-1 mb-2 fw-bold text-dark">Partners de Producción</h1>
+            <p className="text-muted" style={{ maxWidth: "600px" }}>
+              Directorio oficial de estudios VFX, agencias de casting, abastecimiento de utilería y productoras asociadas a AETHER Entertainment.
+            </p>
           </div>
-        ) : (
-          <>
-            <TablaProveedores />
-            <Paginacion />
-          </>
-        )}
-      </div>
-    </section>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="mb-4"
+          >
+            <input
+              value={textoBuscar}
+              onChange={handleSearchChange}
+              type="text"
+              className="form-control py-2 px-3 shadow-none"
+              placeholder="🔍 Buscar empresa proveedora..."
+            />
+          </motion.div>
+
+          {cargando ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando proveedores...</span>
+              </div>
+            </div>
+          ) : (
+            <AnimatePresence mode="wait">
+              {listaFiltradaYOrdenada.length === 0 ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="alert alert-info text-center py-4"
+                >
+                  No se encontraron proveedores que coincidan con la búsqueda.
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <TablaProveedores />
+                  <Paginacion />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
+        </div>
+      </section>
+    </PageTransition>
   );
 }
